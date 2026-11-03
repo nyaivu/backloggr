@@ -13,6 +13,25 @@ class BacklogScreen extends StatefulWidget {
 }
 
 class _BacklogScreenState extends State<BacklogScreen> {
+  late Future<List<BacklogItem>> _backlogFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBacklog();
+  }
+
+  void _loadBacklog() {
+    _backlogFuture = SupabaseService().fetchBacklog();
+  }
+
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _loadBacklog();
+    });
+    await _backlogFuture;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -32,57 +51,60 @@ class _BacklogScreenState extends State<BacklogScreen> {
         body: Column(
           children: [
             Expanded(
-              child: FutureBuilder<List<BacklogItem>>(
-                // Pastikan method ini dipanggil sekali, bukan langsung instantiate di build
-                future: SupabaseService().fetchBacklog(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (snapshot.hasData) {
-                    // snapshot.data LANGSUNG berupa List<BacklogItem>
-                    final List<BacklogItem> games = snapshot.data!;
+              child: RefreshIndicator(
+                onRefresh: _handleRefresh,
+                child: FutureBuilder<List<BacklogItem>>(
+                  // Pastikan method ini dipanggil sekali, bukan langsung instantiate di build
+                  future: _backlogFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (snapshot.hasData) {
+                      // snapshot.data LANGSUNG berupa List<BacklogItem>
+                      final List<BacklogItem> games = snapshot.data!;
 
-                    if (games.isEmpty) {
-                      return const Center(child: Text("No games found."));
+                      if (games.isEmpty) {
+                        return const Center(child: Text("No games found."));
+                      }
+
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          final crossAxisCount = 3;
+                          return GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: crossAxisCount,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio: 2 / 3,
+                                ),
+                            itemCount: games.length,
+                            itemBuilder: (context, index) {
+                              final game = games[index];
+
+                              return Material(
+                                color: Colors.transparent,
+                                child: GameCard(
+                                  title: game.gameTitle,
+                                  imageUrl: game.coverUrl!,
+                                  onTap: () {
+                                    context.push(
+                                      '/detail',
+                                      extra: {'id': game.gameId},
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
                     }
-
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        final crossAxisCount = 3;
-                        return GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 2 / 3,
-                              ),
-                          itemCount: games.length,
-                          itemBuilder: (context, index) {
-                            final game = games[index];
-
-                            return Material(
-                              color: Colors.transparent,
-                              child: GameCard(
-                                title: game.gameTitle,
-                                imageUrl: game.coverUrl!,
-                                onTap: () {
-                                  context.push(
-                                    '/detail',
-                                    extra: {'id': game.gameId},
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  }
-                  return const Center(child: Text("Empty state"));
-                },
+                    return const Center(child: Text("Empty state"));
+                  },
+                ),
               ),
             ),
           ],
