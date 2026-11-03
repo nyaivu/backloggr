@@ -1,3 +1,4 @@
+import 'package:backloggr/data/services/cheapshark_api_service.dart';
 import 'package:flutter/material.dart';
 
 class GameDetailScreen extends StatefulWidget {
@@ -12,6 +13,17 @@ class GameDetailScreen extends StatefulWidget {
 class _GameDetailScreenState extends State<GameDetailScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            Text(widget.id),
+            // FutureBuilder(future: CheapSharkApiService().fetchGameDetail(widget.id), builder: (context, index) {
+
+            // })
+          ],
+        ),
+      ),
+    );
   }
 }

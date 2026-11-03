@@ -14,6 +14,7 @@ dependencies:
   supabase_flutter: ^2.18.3
   http: ^1.6.0
   exui: ^1.0.11
+  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:

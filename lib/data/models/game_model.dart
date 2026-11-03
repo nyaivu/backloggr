@@ -1,5 +1,5 @@
 /// Data model for representing game deals and catalog items from CheapShark API.
-class DealModel {
+class GameModel {
   final String dealID;
   final String gameID;
   final String title;
@@ -16,7 +16,7 @@ class DealModel {
   final String thumb;
   final double dealRating;
 
-  DealModel({
+  GameModel({
     required this.dealID,
     required this.gameID,
     required this.title,
@@ -35,8 +35,8 @@ class DealModel {
   });
 
   /// Factory constructor for parsing responses from `/api/1.0/deals`
-  factory DealModel.fromDealJson(Map<String, dynamic> json) {
-    return DealModel(
+  factory GameModel.fromDealJson(Map<String, dynamic> json) {
+    return GameModel(
       dealID: json['dealID'] as String? ?? '',
       gameID: json['gameID'] as String? ?? '',
       title: json['title'] as String? ?? 'Unknown Title',
@@ -61,11 +61,11 @@ class DealModel {
   }
 
   /// Factory constructor for parsing global search lookup from `/api/1.0/games`
-  factory DealModel.fromGameSearchJson(Map<String, dynamic> json) {
+  factory GameModel.fromGameSearchJson(Map<String, dynamic> json) {
     final cheapestPrice =
         double.tryParse(json['cheapest']?.toString() ?? '0.0') ?? 0.0;
 
-    return DealModel(
+    return GameModel(
       dealID: json['cheapestDealID'] as String? ?? '',
       gameID: json['gameID'] as String? ?? '',
       title: json['external'] as String? ?? 'Unknown Title',

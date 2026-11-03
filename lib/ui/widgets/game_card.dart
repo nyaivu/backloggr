@@ -22,7 +22,7 @@ class _GameCardState extends State<GameCard> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(4.0),
+      borderRadius: BorderRadius.circular(0),
       child: Stack(
         fit: StackFit.expand,
         children: [

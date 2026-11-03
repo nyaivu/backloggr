@@ -15,7 +15,7 @@ class CheapSharkApiService {
   /// Fetches a list of active game deals for general catalog browsing.
   ///
   /// Supports pagination ([pageNumber], [pageSize]) and optional filtering [title].
-  Future<List<DealModel>> fetchDeals({
+  Future<List<GameModel>> fetchDeals({
     String? title,
     int pageSize = 20,
     int pageNumber = 0,
@@ -39,7 +39,7 @@ class CheapSharkApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
-        return jsonList.map((json) => DealModel.fromDealJson(json)).toList();
+        return jsonList.map((json) => GameModel.fromDealJson(json)).toList();
       } else {
         throw Exception('Server returned status code: ${response.statusCode}');
       }
@@ -51,7 +51,7 @@ class CheapSharkApiService {
   /// Global title search via `/api/1.0/games`.
   ///
   /// Searches CheapShark's complete database even if the game currently has no active deal.
-  Future<List<DealModel>> searchGames(String titleQuery) async {
+  Future<List<GameModel>> searchGames(String titleQuery) async {
     if (titleQuery.trim().isEmpty) return [];
 
     final uri = Uri.https(_baseUrl, _gamesEndpoint, {
@@ -66,7 +66,33 @@ class CheapSharkApiService {
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
         return jsonList
-            .map((json) => DealModel.fromGameSearchJson(json))
+            .map((json) => GameModel.fromGameSearchJson(json))
+            .toList();
+      } else {
+        throw Exception('Server returned status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Network error while searching CheapShark API: $e');
+    }
+  }
+
+  /// Global title search via `/api/1.0/games`.
+  ///
+  /// Searches CheapShark's complete database even if the game currently has no active deal.
+  Future<List<GameModel>> fetchGameDetail(String id) async {
+    if (id.trim().isEmpty) return [];
+
+    final uri = Uri.https(_baseUrl, _gamesEndpoint, {'id': id.trim()});
+
+    try {
+      final response = await _client
+          .get(uri)
+          .timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = jsonDecode(response.body);
+        return jsonList
+            .map((json) => GameModel.fromGameSearchJson(json))
             .toList();
       } else {
         throw Exception('Server returned status code: ${response.statusCode}');

@@ -2,9 +2,9 @@ import 'package:backloggr/core/constants.dart';
 import 'package:backloggr/data/models/game_model.dart';
 import 'package:backloggr/data/services/cheapshark_api_service.dart';
 import 'package:backloggr/ui/widgets/game_card.dart';
+import 'package:backloggr/ui/widgets/game_detail_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:exui/exui.dart';
-import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
-  late Future<List<DealModel>> _futureQuery;
+  late Future<List<GameModel>> _futureQuery;
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ).paddingAll(16),
 
               Expanded(
-                child: FutureBuilder<List<DealModel>>(
+                child: FutureBuilder<List<GameModel>>(
                   // Pastikan method ini dipanggil sekali, bukan langsung instantiate di build
                   future: _futureQuery,
                   builder: (context, snapshot) {
@@ -79,8 +79,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     } else if (snapshot.hasData) {
-                      // snapshot.data LANGSUNG berupa List<DealModel>
-                      final List<DealModel> deals = snapshot.data!;
+                      // snapshot.data LANGSUNG berupa List<GameModel>
+                      final List<GameModel> deals = snapshot.data!;
 
                       if (deals.isEmpty) {
                         return const Center(child: Text("No deals found."));
@@ -107,9 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   title: deal.title,
                                   imageUrl: deal.verticalCoverUrl,
                                   onTap: () {
-                                    context.push(
-                                      '/detail',
-                                      extra: {'id': deal.gameID},
+                                    showGameDetailModal(
+                                      context: context,
+                                      gameId: deal.gameID,
+                                      title: deal.title,
+                                      imageUrl: deal.hdCoverUrl,
                                     );
                                   },
                                 ),

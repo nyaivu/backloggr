@@ -1,3 +1,7 @@
+import 'package:backloggr/data/models/backlog_item.dart';
+import 'package:backloggr/data/services/supabase_service.dart';
+import 'package:backloggr/ui/widgets/game_card.dart';
+import 'package:backloggr/ui/widgets/game_detail_modal.dart';
 import 'package:flutter/material.dart';
 
 class BacklogScreen extends StatefulWidget {
@@ -10,6 +14,69 @@ class BacklogScreen extends StatefulWidget {
 class _BacklogScreenState extends State<BacklogScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder<List<BacklogItem>>(
+                // Pastikan method ini dipanggil sekali, bukan langsung instantiate di build
+                future: SupabaseService().fetchBacklog(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (snapshot.hasData) {
+                    // snapshot.data LANGSUNG berupa List<BacklogItem>
+                    final List<BacklogItem> games = snapshot.data!;
+
+                    if (games.isEmpty) {
+                      return const Center(child: Text("No games found."));
+                    }
+
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        final crossAxisCount = 3;
+                        return GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 2 / 3,
+                              ),
+                          itemCount: games.length,
+                          itemBuilder: (context, index) {
+                            final game = games[index];
+
+                            return Material(
+                              color: Colors.transparent,
+                              child: GameCard(
+                                title: game.gameTitle,
+                                imageUrl: game.coverUrl!,
+                                onTap: () {
+                                  showGameDetailModal(
+                                    context: context,
+                                    gameId: game.gameId.toString(),
+                                    title: game.gameTitle,
+                                    imageUrl: game.coverUrl!,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
+                  return const Center(child: Text("Empty state"));
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

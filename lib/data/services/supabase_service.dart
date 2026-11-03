@@ -24,11 +24,24 @@ class SupabaseService {
   }
 
   // Insert Item
-  Future<void> addToBacklog(BacklogItem item) async {
-    final data = item.toJson();
-    data['user_id'] = _currentUserId; // Bind authenticated user's UUID
+  Future<void> addToBacklog({
+    required String gameId,
+    required String title,
+    required String coverUrl,
+  }) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      throw Exception('User is not authenticated.');
+    }
 
-    await _supabase.from('user_game_backlog').insert(data);
+    await _supabase.from('user_game_backlog').insert({
+      'user_id': user.id,
+      'game_id': gameId,
+      'game_title': title,
+      'cover_url': coverUrl,
+      'completion_status': 'Unfinished',
+      'created_at': DateTime.now().toIso8601String(),
+    });
   }
 
   // Update Item
