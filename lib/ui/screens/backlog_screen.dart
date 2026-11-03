@@ -1,8 +1,9 @@
+import 'package:backloggr/core/constants.dart';
 import 'package:backloggr/data/models/backlog_item.dart';
 import 'package:backloggr/data/services/supabase_service.dart';
 import 'package:backloggr/ui/widgets/game_card.dart';
-import 'package:backloggr/ui/widgets/game_detail_modal.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BacklogScreen extends StatefulWidget {
   const BacklogScreen({super.key});
@@ -16,6 +17,18 @@ class _BacklogScreenState extends State<BacklogScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "BACKLOG",
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          centerTitle: true,
+          backgroundColor: AppColors.scaffoldBackground,
+          scrolledUnderElevation: 0.0,
+        ),
         body: Column(
           children: [
             Expanded(
@@ -56,11 +69,9 @@ class _BacklogScreenState extends State<BacklogScreen> {
                                 title: game.gameTitle,
                                 imageUrl: game.coverUrl!,
                                 onTap: () {
-                                  showGameDetailModal(
-                                    context: context,
-                                    gameId: game.gameId.toString(),
-                                    title: game.gameTitle,
-                                    imageUrl: game.coverUrl!,
+                                  context.push(
+                                    '/detail',
+                                    extra: {'id': game.gameId},
                                   );
                                 },
                               ),

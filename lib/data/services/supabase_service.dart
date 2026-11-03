@@ -23,6 +23,20 @@ class SupabaseService {
         .toList();
   }
 
+  // Fetch Backlog for Authenticated User
+  Future<BacklogItem?> fetchBacklogByID(String id) async {
+    final response = await _supabase
+        .from('user_game_backlog')
+        .select()
+        .eq('user_id', _currentUserId)
+        .eq('game_id', id)
+        .maybeSingle(); // Returns null safely if no matching game is found
+
+    if (response == null) return null;
+
+    return BacklogItem.fromJson(response);
+  }
+
   // Insert Item
   Future<void> addToBacklog({
     required String gameId,

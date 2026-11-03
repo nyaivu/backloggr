@@ -1,6 +1,6 @@
 import 'package:backloggr/core/constants.dart';
 import 'package:backloggr/ui/screens/backlog_screen.dart';
-import 'package:backloggr/ui/screens/game_detail_screen.dart';
+import 'package:backloggr/ui/screens/backlog_detail_screen.dart';
 import 'package:backloggr/ui/screens/home_screen.dart';
 import 'package:backloggr/ui/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -164,7 +164,7 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>;
 
-        return GameDetailScreen(id: extra['id'] as String);
+        return BacklogDetailScreen(id: extra['id'].toString());
       },
     ),
   ],
