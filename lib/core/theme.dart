@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'constants.dart';
 
 class AppTheme {
-  static ThemeData get lightTheme {
+  static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.scaffoldBackground,
