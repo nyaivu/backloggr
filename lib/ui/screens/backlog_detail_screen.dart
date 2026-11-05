@@ -1,10 +1,12 @@
 import 'package:backloggr/core/constants.dart';
 import 'package:backloggr/data/models/backlog_item.dart';
+import 'package:backloggr/data/providers/backlog_notifier.dart';
 import 'package:backloggr/data/services/supabase_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_flutter/dropdown_flutter.dart';
 import 'package:exui/exui.dart';
+import 'package:provider/provider.dart';
 
 class BacklogDetailScreen extends StatefulWidget {
   final String id;
@@ -26,7 +28,6 @@ class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // 1. Fetch future ONCE during initialization so builds don't re-trigger fetch
     _backlogFuture = SupabaseService().fetchBacklogByID(widget.id);
   }
 
@@ -42,12 +43,11 @@ class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
       reviewNotes: _notesController.text.trim(),
     );
     try {
-      print(_notesController.text.trim());
       await SupabaseService().updateBacklogItem(updatedItem);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Changes saved successfully!'),
             backgroundColor: AppColors.steamGreen,
           ),
@@ -67,171 +67,253 @@ class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
     }
   }
 
+  Future<void> _handleDelete(BuildContext context, int id, String title) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.scaffoldBackground,
+        title: const Text(
+          'Delete Game',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to remove "$title" from your backlog?',
+          style: const TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('CANCEL', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.steamDiscountRed,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('DELETE', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && context.mounted) {
+      try {
+        await context.read<BacklogProvider>().deleteItem(id);
+
+        if (context.mounted) {
+          Navigator.of(context).pop(); // Return to previous screen
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$title removed from backlog.'),
+              backgroundColor: AppColors.steamGreen,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete: ${e.toString()}'),
+              backgroundColor: AppColors.steamDiscountRed,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
-      appBar: AppBar(
-        title: Text(
-          "DETAILS",
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w700,
+    return FutureBuilder<BacklogItem?>(
+      future: _backlogFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: AppColors.scaffoldBackground,
+            appBar: AppBar(
+              title: const Text("DETAILS"),
+              centerTitle: true,
+              backgroundColor: AppColors.scaffoldBackground,
+              iconTheme: const IconThemeData(color: AppColors.textPrimary),
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasError ||
+            !snapshot.hasData ||
+            snapshot.data == null) {
+          return Scaffold(
+            backgroundColor: AppColors.scaffoldBackground,
+            appBar: AppBar(
+              title: const Text("DETAILS"),
+              centerTitle: true,
+              backgroundColor: AppColors.scaffoldBackground,
+              iconTheme: const IconThemeData(color: AppColors.textPrimary),
+            ),
+            body: Center(
+              child: Text(
+                snapshot.hasError
+                    ? 'Error: ${snapshot.error}'
+                    : 'Item not found.',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+        }
+
+        final BacklogItem item = snapshot.data!;
+
+        if (!_isInitialized) {
+          _notesController.text = item.reviewNotes ?? "";
+          _selectedStatus = item.completionStatus;
+          _isInitialized = true;
+        }
+
+        return Scaffold(
+          backgroundColor: AppColors.scaffoldBackground,
+          appBar: AppBar(
+            title: Text(
+              item.gameTitle.toUpperCase(),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+            actions: [
+              if (item.id != null)
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.redAccent,
+                  ),
+                  tooltip: 'Delete Game',
+                  onPressed: () =>
+                      _handleDelete(context, item.id!, item.gameTitle),
+                ),
+            ],
+            iconTheme: const IconThemeData(color: AppColors.textPrimary),
+            centerTitle: true,
+            backgroundColor: AppColors.scaffoldBackground,
+            scrolledUnderElevation: 0.0,
           ),
-        ),
-        iconTheme: IconThemeData(
-          color: AppColors.textPrimary, // Change your color here
-        ),
-        centerTitle: true,
-        backgroundColor: AppColors.scaffoldBackground,
-        scrolledUnderElevation: 0.0,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(bottom: 32),
-            child: Column(
-              children: [
-                FutureBuilder(
-                  future: _backlogFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (snapshot.hasData) {
-                      final BacklogItem item = snapshot.data!;
-
-                      if (!_isInitialized) {
-                        _notesController.text = item.reviewNotes ?? "";
-                        _selectedStatus = item.completionStatus;
-                        _isInitialized = true;
-                      }
-
-                      return SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          spacing: 16,
-                          children: [
-                            CachedNetworkImage(
-                              imageUrl: item.capsuleUrl!,
-                              fit: BoxFit.cover,
-                              errorWidget: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[800],
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.sports_esports,
-                                        color: Colors.white54,
-                                      ),
-                                      Text(
-                                        item.gameTitle,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                            Text(
-                              item.gameTitle,
-                              style: TextStyle(fontSize: 20),
-                            ),
-                            SizedBox(
-                              width: 256,
-                              child: DropdownFlutter<String>(
-                                hideSelectedFieldWhenExpanded: false,
-                                hintText: 'Select priority',
-                                items: const [
-                                  'Backlog',
-                                  'Playing',
-                                  'Completed',
-                                ],
-                                initialItem: item.completionStatus, // optional
-                                onChanged: (value) => _selectedStatus = value!,
-                              ),
-                            ),
-                            Column(
-                              spacing: 4,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  spacing: 16,
+                  children: [
+                    if (item.capsuleUrl != null && item.capsuleUrl!.isNotEmpty)
+                      CachedNetworkImage(
+                        imageUrl: item.capsuleUrl!,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, error, stackTrace) {
+                          return Container(
+                            height: 180,
+                            color: Colors.grey[800],
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text("Notes", style: TextStyle(fontSize: 16)),
-                                Text(
-                                  "Note your progress and thoughts about the game",
-                                  style: TextStyle(fontSize: 14),
+                                const Icon(
+                                  Icons.sports_esports,
+                                  color: Colors.white54,
                                 ),
-                                TextField(
-                                  maxLines: 12,
-                                  minLines: 6,
-                                  controller: _notesController,
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: AppColors.gray300,
-                                    hintText: "Notes go here...",
-                                  ),
-                                  style: TextStyle(color: AppColors.gray950),
-                                ).paddingAll(16),
-                                Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.steamBlue
-                                            .withAlpha(20),
-                                        foregroundColor: AppColors.steamBlue,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 14,
-                                        ),
-                                      ),
-                                      onPressed: _isLoading
-                                          ? null
-                                          : () => _handleSaveChanges(
-                                              item,
-                                              _selectedStatus,
-                                              _notesController.text,
-                                            ),
-                                      icon: _isLoading
-                                          ? const SizedBox(
-                                              width: 20,
-                                              height: 20,
-                                              child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                                strokeWidth: 2,
-                                              ),
-                                            )
-                                          : const Icon(Icons.save_rounded),
-                                      label: Text(
-                                        _isLoading
-                                            ? 'Adding...'
-                                            : 'SAVE CHANGES',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0.8,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ).paddingHorizontal(16),
+                                Text(
+                                  item.gameTitle,
+                                  textAlign: TextAlign.center,
+                                ),
                               ],
                             ),
-                          ],
+                          );
+                        },
+                      ),
+                    Text(
+                      item.gameTitle,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 256,
+                      child: DropdownFlutter<String>(
+                        hideSelectedFieldWhenExpanded: false,
+                        hintText: 'Select priority',
+                        items: const ['Backlog', 'Playing', 'Completed'],
+                        initialItem: item.completionStatus,
+                        onChanged: (value) => _selectedStatus = value!,
+                      ),
+                    ),
+                    Column(
+                      spacing: 4,
+                      children: [
+                        const Text("Notes", style: TextStyle(fontSize: 16)),
+                        const Text(
+                          "Note your progress and thoughts about the game",
+                          style: TextStyle(fontSize: 14),
                         ),
-                      );
-                    } else {
-                      return Text("Invalid item.");
-                    }
-                  },
+                        TextField(
+                          maxLines: 12,
+                          minLines: 6,
+                          controller: _notesController,
+                          decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: AppColors.gray300,
+                            hintText: "Notes go here...",
+                          ),
+                          style: const TextStyle(color: AppColors.gray950),
+                        ).paddingAll(16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.steamBlue.withAlpha(
+                                  20,
+                                ),
+                                foregroundColor: AppColors.steamBlue,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                              ),
+                              onPressed: _isLoading
+                                  ? null
+                                  : () => _handleSaveChanges(
+                                      item,
+                                      _selectedStatus,
+                                      _notesController.text,
+                                    ),
+                              icon: _isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.save_rounded),
+                              label: Text(
+                                _isLoading ? 'SAVING...' : 'SAVE CHANGES',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ).paddingHorizontal(16),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

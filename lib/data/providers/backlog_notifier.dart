@@ -55,4 +55,25 @@ class BacklogProvider extends ChangeNotifier {
       rethrow;
     }
   }
+
+  // Optimistic Delete
+  Future<void> deleteItem(int id) async {
+    final index = _items.indexWhere((i) => i.id == id);
+    if (index == -1) return;
+
+    final removedItem = _items[index];
+
+    // Remove immediately from UI
+    _items.removeAt(index);
+    notifyListeners();
+
+    try {
+      await SupabaseService().deleteBacklogItem(id);
+    } catch (e) {
+      // Rollback if Supabase deletion fails
+      _items.insert(index, removedItem);
+      notifyListeners();
+      rethrow;
+    }
+  }
 }
