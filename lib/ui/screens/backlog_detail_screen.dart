@@ -16,9 +16,18 @@ class BacklogDetailScreen extends StatefulWidget {
 
 class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
   final TextEditingController _notesController = TextEditingController();
-  String _selectedStatus = "Backlog";
+  late Future<BacklogItem?> _backlogFuture;
 
+  String _selectedStatus = "Backlog";
+  bool _isInitialized = false;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 1. Fetch future ONCE during initialization so builds don't re-trigger fetch
+    _backlogFuture = SupabaseService().fetchBacklogByID(widget.id);
+  }
 
   Future<void> _handleSaveChanges(
     BacklogItem existingItem,
@@ -79,7 +88,7 @@ class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
         body: Column(
           children: [
             FutureBuilder(
-              future: SupabaseService().fetchBacklogByID(widget.id),
+              future: _backlogFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -87,7 +96,12 @@ class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
                   final BacklogItem item = snapshot.data!;
-                  _notesController.text = item.reviewNotes ?? "";
+
+                  if (!_isInitialized) {
+                    _notesController.text = item.reviewNotes ?? "";
+                    _selectedStatus = item.completionStatus;
+                    _isInitialized = true;
+                  }
 
                   return SizedBox(
                     width: double.infinity,
@@ -129,57 +143,66 @@ class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
                             onChanged: (value) => _selectedStatus = value!,
                           ),
                         ),
-                        Text("Notes", style: TextStyle(fontSize: 16)),
-                        TextField(
-                          maxLines: 12,
-                          minLines: 6,
-                          controller: _notesController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.gray300,
-                          ),
-                          style: TextStyle(color: AppColors.gray950),
-                        ).paddingAll(16),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          spacing: 4,
                           children: [
-                            ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.steamBlue.withAlpha(
-                                  20,
-                                ),
-                                foregroundColor: AppColors.steamBlue,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                              ),
-                              onPressed: _isLoading
-                                  ? null
-                                  : () => _handleSaveChanges(
-                                      item,
-                                      _selectedStatus,
-                                      _notesController.text,
-                                    ),
-                              icon: _isLoading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(Icons.save_rounded),
-                              label: Text(
-                                _isLoading ? 'Adding...' : 'SAVE CHANGES',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.8,
-                                ),
-                              ),
+                            Text("Notes", style: TextStyle(fontSize: 16)),
+                            Text(
+                              "Note your progress and thoughts about the game",
+                              style: TextStyle(fontSize: 14),
                             ),
+                            TextField(
+                              maxLines: 12,
+                              minLines: 6,
+                              controller: _notesController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: AppColors.gray300,
+                                hintText: "Notes go here...",
+                              ),
+                              style: TextStyle(color: AppColors.gray950),
+                            ).paddingAll(16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.steamBlue
+                                        .withAlpha(20),
+                                    foregroundColor: AppColors.steamBlue,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () => _handleSaveChanges(
+                                          item,
+                                          _selectedStatus,
+                                          _notesController.text,
+                                        ),
+                                  icon: _isLoading
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(Icons.save_rounded),
+                                  label: Text(
+                                    _isLoading ? 'Adding...' : 'SAVE CHANGES',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ).paddingHorizontal(16),
                           ],
-                        ).paddingHorizontal(16),
+                        ),
                       ],
                     ),
                   );

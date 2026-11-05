@@ -80,9 +80,14 @@ class _GameDetailModalContentState extends State<_GameDetailModalContent> {
       }
     } catch (e) {
       if (mounted) {
+        String errorMessage = "Error: ${e.toString()}";
+        if (e.toString().contains('23505') ||
+            e.toString().contains('duplicate key value')) {
+          errorMessage = "This game is already in your backlog!";
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(errorMessage),
             backgroundColor: AppColors.steamDiscountRed,
           ),
         );
