@@ -66,13 +66,34 @@ class _BacklogScreenState extends State<BacklogScreen> {
                       final List<BacklogItem> games = snapshot.data!;
 
                       if (games.isEmpty) {
-                        return const Center(child: Text("No games found."));
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            return SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: constraints
+                                      .maxHeight, // Fills entire parent height
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    "No games found.",
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
                       }
 
                       return LayoutBuilder(
                         builder: (context, constraints) {
                           final crossAxisCount = 3;
                           return GridView.builder(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: crossAxisCount,

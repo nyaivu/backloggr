@@ -5,8 +5,8 @@ class BacklogItem {
   final int gameId;
   final String gameTitle;
   final String? coverUrl;
+  final String? capsuleUrl;
   final String completionStatus;
-  final double personalRating;
   final String? reviewNotes;
   final DateTime? createdAt;
 
@@ -16,8 +16,8 @@ class BacklogItem {
     required this.gameId,
     required this.gameTitle,
     this.coverUrl,
+    this.capsuleUrl,
     this.completionStatus = 'Backlog',
-    this.personalRating = 0.0,
     this.reviewNotes,
     this.createdAt,
   });
@@ -34,8 +34,8 @@ class BacklogItem {
           : int.parse(json['game_id'].toString()),
       gameTitle: json['game_title'] as String? ?? 'Unknown Title',
       coverUrl: json['cover_url'] as String?,
+      capsuleUrl: json['capsule_url'] as String?,
       completionStatus: json['completion_status'] as String? ?? 'Backlog',
-      personalRating: (json['personal_rating'] as num?)?.toDouble() ?? 0.0,
       reviewNotes: json['review_notes'] as String?,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
@@ -50,8 +50,8 @@ class BacklogItem {
       'game_id': gameId,
       'game_title': gameTitle,
       'cover_url': coverUrl,
+      'capsule_url': capsuleUrl,
       'completion_status': completionStatus,
-      'personal_rating': personalRating,
       'review_notes': reviewNotes,
     };
 
@@ -70,8 +70,8 @@ class BacklogItem {
     int? gameId,
     String? gameTitle,
     String? coverUrl,
+    String? capsuleUrl,
     String? completionStatus,
-    double? personalRating,
     String? reviewNotes,
     DateTime? createdAt,
   }) {
@@ -81,8 +81,8 @@ class BacklogItem {
       gameId: gameId ?? this.gameId,
       gameTitle: gameTitle ?? this.gameTitle,
       coverUrl: coverUrl ?? this.coverUrl,
+      capsuleUrl: capsuleUrl ?? this.capsuleUrl,
       completionStatus: completionStatus ?? this.completionStatus,
-      personalRating: personalRating ?? this.personalRating,
       reviewNotes: reviewNotes ?? this.reviewNotes,
       createdAt: createdAt ?? this.createdAt,
     );

@@ -42,6 +42,7 @@ class SupabaseService {
     required String gameId,
     required String title,
     required String coverUrl,
+    required String capsuleUrl,
   }) async {
     final user = _supabase.auth.currentUser;
     if (user == null) {
@@ -53,7 +54,8 @@ class SupabaseService {
       'game_id': gameId,
       'game_title': title,
       'cover_url': coverUrl,
-      'completion_status': 'Unfinished',
+      'capsule_url': capsuleUrl,
+      'completion_status': 'Backlog',
       'created_at': DateTime.now().toIso8601String(),
     });
   }

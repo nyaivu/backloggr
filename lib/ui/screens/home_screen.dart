@@ -111,7 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       context: context,
                                       gameId: deal.gameID,
                                       title: deal.title,
-                                      imageUrl: deal.hdCoverUrl,
+                                      coverUrl: deal.verticalCoverUrl,
+                                      capsuleUrl: deal.capsuleUrl,
                                     );
                                   },
                                 ),

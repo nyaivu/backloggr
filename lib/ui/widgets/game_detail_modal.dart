@@ -6,7 +6,8 @@ void showGameDetailModal({
   required BuildContext context,
   required String gameId,
   required String title,
-  required String imageUrl,
+  required String coverUrl,
+  required String capsuleUrl,
 }) {
   showGeneralDialog(
     context: context,
@@ -28,7 +29,8 @@ void showGameDetailModal({
           child: _GameDetailModalContent(
             gameId: gameId,
             title: title,
-            imageUrl: imageUrl,
+            coverUrl: coverUrl,
+            capsuleUrl: capsuleUrl,
           ),
         ),
       );
@@ -39,12 +41,14 @@ void showGameDetailModal({
 class _GameDetailModalContent extends StatefulWidget {
   final String gameId;
   final String title;
-  final String imageUrl;
+  final String coverUrl;
+  final String capsuleUrl;
 
   const _GameDetailModalContent({
     required this.gameId,
     required this.title,
-    required this.imageUrl,
+    required this.coverUrl,
+    required this.capsuleUrl,
   });
 
   @override
@@ -61,7 +65,8 @@ class _GameDetailModalContentState extends State<_GameDetailModalContent> {
       await SupabaseService().addToBacklog(
         gameId: widget.gameId,
         title: widget.title,
-        coverUrl: widget.imageUrl,
+        coverUrl: widget.coverUrl,
+        capsuleUrl: widget.capsuleUrl,
       );
 
       if (mounted) {
@@ -106,7 +111,7 @@ class _GameDetailModalContentState extends State<_GameDetailModalContent> {
                   AspectRatio(
                     aspectRatio: 16 / 9,
                     child: Image.network(
-                      widget.imageUrl,
+                      widget.capsuleUrl,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Container(

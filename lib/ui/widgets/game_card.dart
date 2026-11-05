@@ -19,6 +19,17 @@ class GameCard extends StatefulWidget {
 class _GameCardState extends State<GameCard> {
   bool _isPressed = false;
 
+  void _setPressedState(bool pressed) {
+    if (!mounted) return;
+
+    // Safely defer setState execution if the widget tree is locked mid-frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _isPressed != pressed) {
+        setState(() => _isPressed = pressed);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -46,12 +57,12 @@ class _GameCardState extends State<GameCard> {
           ),
 
           // 2. Dark Overlay Layer (Visible only when touched)
-          if (_isPressed)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withValues(alpha: 0.4), // 40% dark overlay
-              ),
-            ),
+          // if (_isPressed)
+          //   Positioned.fill(
+          //     child: Container(
+          //       color: Colors.black.withValues(alpha: 0.4), // 40% dark overlay
+          //     ),
+          //   ),
 
           // 3. Touch Listener Layer on Top
           Positioned.fill(
@@ -59,9 +70,9 @@ class _GameCardState extends State<GameCard> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: widget.onTap,
-                onTapDown: (_) => setState(() => _isPressed = true),
-                onTapUp: (_) => setState(() => _isPressed = false),
-                onTapCancel: () => setState(() => _isPressed = false),
+                onTapDown: (_) => _setPressedState(true),
+                onTapUp: (_) => _setPressedState(false),
+                onTapCancel: () => _setPressedState(false),
               ),
             ),
           ),

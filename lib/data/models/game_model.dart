@@ -94,17 +94,17 @@ class GameModel {
     }
 
     // Fallback ke gambar HD horizontal jika bukan game Steam
-    return hdCoverUrl;
+    return capsuleUrl;
   }
 
   /// Returns a high-definition image URL by substituting low-res thumbnail paths
-  String get hdCoverUrl {
+  String get capsuleUrl {
     // 1. Cek secara eksplisit apakah steamAppID valid (bukan null, bukan kosong, dan bukan '0')
     if (steamAppID != null &&
         steamAppID!.trim().isNotEmpty &&
         steamAppID != '0' &&
         steamAppID != 'null') {
-      return 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/$steamAppID/header.jpg';
+      return 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/$steamAppID/capsule_616x353.jpg';
     }
 
     // 2. Jika tidak ada steamAppID, gunakan thumbnail asli bawaan API
