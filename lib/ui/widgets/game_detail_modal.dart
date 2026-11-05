@@ -181,8 +181,8 @@ class _GameDetailModalContentState extends State<_GameDetailModalContent> {
                   children: [
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.steamBlue,
-                        foregroundColor: AppColors.gray950,
+                        backgroundColor: AppColors.steamBlue.withAlpha(20),
+                        foregroundColor: AppColors.steamBlue,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),

@@ -145,8 +145,10 @@ class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
                           children: [
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.steamBlue,
-                                foregroundColor: AppColors.gray950,
+                                backgroundColor: AppColors.steamBlue.withAlpha(
+                                  20,
+                                ),
+                                foregroundColor: AppColors.steamBlue,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 14,
                                 ),
