@@ -1,6 +1,6 @@
 # Backloggr - Mobile Game Backlog & Deal Tracker
 
-**Backloggr** adalah aplikasi _game backlog tracker_ dan _deal browser_ berbasis Flutter. Aplikasi ini memfasilitasi pengguna dalam melakukan penelusuran katalog diskon game Steam secara _real-time_ via **CheapShark API**, sekaligus mengelola daftar koleksi _game backlog_ pribadi (status penyelesaian, skala prioritas, dan catatan progres) yang tersimpan secara _persistent_ di **Supabase Cloud Database**.
+**Backloggr** adalah aplikasi _mobile game backlog tracker_ dan _deal browser_ berbasis Flutter. Aplikasi ini memfasilitasi pengguna dalam melakukan penelusuran katalog diskon game Steam secara _real-time_ via **CheapShark API**, sekaligus mengelola daftar koleksi _game backlog_ pribadi (status penyelesaian, skala prioritas, dan catatan progres) yang tersimpan secara _persistent_ di **Supabase Cloud Database**.
 
 Aplikasi ini dibangun untuk memenuhi kualifikasi **Project Ujian Tengah Semester (UTS) Pemrograman Mobile**, Universitas Pendidikan Ganesha.
 
@@ -44,7 +44,7 @@ Aplikasi ini dibangun untuk memenuhi kualifikasi **Project Ujian Tengah Semester
 
 ---
 
-## Tech Stack & Dependencies
+## ️ Tech Stack & Dependencies
 
 - **Framework**: Flutter (Dart SDK `>=3.3.0 <4.0.0`)
 - **Architecture**: Clean Architecture / Layered Architecture (UI → Provider → Service → Database/API)
@@ -73,13 +73,15 @@ Aplikasi ini dibangun untuk memenuhi kualifikasi **Project Ujian Tengah Semester
 - **Columns**:
   - `id` (`int8`, Primary Key, Auto-increment)
   - `user_id` (`uuid`, Foreign Key ke `auth.users`)
-  - `game_id` (`text`, Unique constraint untuk mendedeksi duplikasi game)
+  - `game_id` (`text`)
   - `game_title` (`text`)
   - `cover_url` (`text`)
   - `capsule_url` (`text`)
   - `completion_status` (`text`, Default: `'Backlog'`)
   - `review_notes` (`text`, Optional)
   - `created_at` (`timestamptz`)
+- **Constraints**:
+  - `user_game_unique`: Composite Unique constraint pada `(user_id, game_id)` untuk mencegah mendedeksi duplikasi game per user.
 
 ---
 
@@ -113,4 +115,72 @@ lib/
 │       ├── game_detail_modal.dart     # Modal Bottom Sheet / Dialog Add to Backlog
 │       └── adaptive_navigation.dart   # Responsive NavigationBar / Rail Shell
 └── main.dart                          # App Entry Point, GoRouter & MultiProvider Setup
+```
+
+---
+
+## Cara Menjalankan Project (Installation Guide)
+
+### Prasyarat
+
+- Dart SDK `^3.3.0` dan Flutter SDK `^3.19.0` terpasang di komputer.
+- Emulator Android/iOS atau Perangkat Fisik tersambung.
+
+### Langkah-Langkah
+
+1. **Clone Repository**
+
+   ```bash
+   git clone https://github.com/nyaivu/backloggr
+   cd backloggr
+   ```
+
+2. **Install Dependencies**
+
+   ```bash
+   flutter pub get
+   ```
+
+3. **Konfigurasi Environment Variables (`.env`)**
+   Buat file `.env` di direktori utama (_root_) project, lalu masukkan kredensial Supabase milikmu:
+
+   ```env
+   SUPABASE_URL=https://XXX.supabase.co
+   SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   ```
+
+4. **Jalankan Aplikasi dalam Mode Debug**
+
+   ```bash
+   flutter run
+   ```
+
+5. **Build APK Release**
+   ```bash
+   flutter build apk --release --split-per-abi
+   ```
+   _File APK release hasil kompilasi akan berada di direktori:_ `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
+
+---
+
+## Git Commit Log
+
+Proses pengembangan dikomit secara berkala sesuai dengan tahap integrasi fitur (_Milestones_):
+
+```text
+2d755e5 (HEAD -> main, origin/main, origin/HEAD) Implemented App Icon
+2c768fa Added Responsive Breakpoint to Login Screen
+73da0ed Added Logout Function to Profile Screen
+88325a3 Added Backlog Provider as State Management
+1fdfd4d Responsive Grid and Game Modal
+8dede20 Added Duplicate Game Error Handling
+97c3563 Updated Button Styling
+c36cc0e Added Backlog Item Editing Function
+2976ec8 Added Dropdown in Backlog Detail
+b755406 Added Pull Down Refresh Function to Backlogs Screen
+bec454a Implemented Backlog Detail
+34b97f4  Implemented Add/Create Backlog Item to Supabase
+5396437 Completed Game Catalog and Search Screen
+e5c818b Ignored .env
+9e895eb Initial commit
 ```
