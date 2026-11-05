@@ -23,8 +23,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets\icons\ic_backloggr_no_bg.png
+    - assets\icons\ic_backloggr.png
