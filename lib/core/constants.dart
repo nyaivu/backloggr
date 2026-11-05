@@ -40,8 +40,8 @@ class AppColors {
   // ---------------------------------------------------------------------------
   // Typography (WCAG AA compliant)
   // ---------------------------------------------------------------------------
-  static const Color textPrimary = Color(0xFFCCD8E3); // Pale body text
-  static const Color textSecondary = gray400; // Muted slate secondary text
+  static const Color textPrimary = gray100; // Pale body text
+  static const Color textSecondary = gray100; // Muted slate secondary text
   static const Color textAccent = Color(0xFF66C0F4); // Interactive link text
 }
 

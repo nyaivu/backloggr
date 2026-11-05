@@ -11,6 +11,8 @@ class AppTheme {
         surface: AppColors.scaffoldBackground,
       ),
 
+      iconTheme: IconThemeData(color: AppColors.textPrimary),
+
       // --- TYPOGRAPHY ---
       textTheme: const TextTheme(
         // For large titles like "My trips" and "Short trip to Paris"
