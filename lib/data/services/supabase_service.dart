@@ -10,6 +10,16 @@ class SupabaseService {
     return user.id;
   }
 
+  User? getUser() {
+    final user = _supabase.auth.currentUser;
+    if (user != null) return user;
+    return null;
+  }
+
+  void logout() {
+    _supabase.auth.signOut();
+  }
+
   // Fetch Backlog for Authenticated User
   Future<List<BacklogItem>> fetchBacklog() async {
     final response = await _supabase
