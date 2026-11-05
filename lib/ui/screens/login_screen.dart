@@ -1,7 +1,9 @@
+import 'package:backloggr/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:backloggr/data/repositories/auth_repository.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -91,53 +93,110 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Welcome')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Email Input
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
-              ),
-              keyboardType: TextInputType.emailAddress,
-              autocorrect: false,
-            ),
-            const SizedBox(height: 16),
+      appBar: AppBar(title: const Text('')),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Center(
+            child: FractionallySizedBox(
+              widthFactor: context.isAtLeast(Breakpoint.sm) ? 0.5 : 1,
 
-            // Password Input
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
-              ),
-              obscureText: true, // Hides the password dots
-            ),
-            const SizedBox(height: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 16,
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        "BACKLOGGR",
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      Text(
+                        "LOGIN with your email and password below, \n or tap REGISTER to create a new account.",
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
 
-            // Loading Spinner OR Action Buttons
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else ...[
-              ElevatedButton(
-                onPressed: _handleLogin,
-                child: const Text('Login'),
+                  // Email Input
+                  TextField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.email),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                  ),
+
+                  // Password Input
+                  TextField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock),
+                    ),
+                    obscureText: true, // Hides the password dots
+                  ),
+
+                  // Loading Spinner OR Action Buttons
+                  if (_isLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else ...[
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.steamBlue.withAlpha(20),
+                        foregroundColor: AppColors.steamBlue,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      onPressed: _handleLogin,
+                      icon: const Icon(Icons.login),
+                      label: Text(
+                        'LOGIN',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.steamBlue.withAlpha(20),
+                        foregroundColor: AppColors.steamBlue,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      onPressed: _handleRegister,
+                      icon: const Icon(Icons.app_registration),
+                      label: Text(
+                        'REGISTER',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: _handleRegister,
-                child: const Text('Create Account'),
-              ),
-            ],
-          ],
+            ),
+          ),
         ),
       ),
     );

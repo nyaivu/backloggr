@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:exui/exui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+import 'package:go_router/go_router.dart';
 
 void showGameDetailModal({
   required BuildContext context,
@@ -16,7 +17,7 @@ void showGameDetailModal({
     context: context,
     barrierDismissible: true,
     barrierLabel: 'GameDetails',
-    barrierColor: Colors.black.withOpacity(0.7),
+    barrierColor: Colors.black.withAlpha(7),
     transitionDuration: const Duration(milliseconds: 250),
     pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
     transitionBuilder: (context, animation, secondaryAnimation, child) {
@@ -73,7 +74,7 @@ class _GameDetailModalContentState extends State<_GameDetailModalContent> {
       );
 
       if (mounted) {
-        Navigator.of(context).pop();
+        context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${widget.title} added to your backlog!'),

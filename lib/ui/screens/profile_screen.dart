@@ -1,6 +1,7 @@
 import 'package:backloggr/core/constants.dart';
 import 'package:backloggr/data/services/supabase_service.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,6 +14,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final supabase = SupabaseService();
   void _handleLogout() {
     supabase.logout();
+    context.replace('/login');
   }
 
   @override
@@ -21,7 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "BACKLOG",
+          "PROFILE",
           style: TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w700,
@@ -36,7 +38,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(user!.email!),
+              Text(
+                user != null && user.email != null
+                    ? user.email!
+                    : "User not found, please log in again.",
+              ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.steamBlue.withAlpha(20),
