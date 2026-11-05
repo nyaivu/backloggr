@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class GameCard extends StatefulWidget {
@@ -38,10 +39,12 @@ class _GameCardState extends State<GameCard> {
         fit: StackFit.expand,
         children: [
           // 1. Base Image
-          Image.network(
-            widget.imageUrl,
+          CachedNetworkImage(
+            imageUrl: widget.imageUrl,
+            memCacheWidth: 300,
+            filterQuality: FilterQuality.low,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
+            errorWidget: (context, error, stackTrace) {
               return Container(
                 color: Colors.grey[800],
                 child: Column(
@@ -55,14 +58,6 @@ class _GameCardState extends State<GameCard> {
               );
             },
           ),
-
-          // 2. Dark Overlay Layer (Visible only when touched)
-          // if (_isPressed)
-          //   Positioned.fill(
-          //     child: Container(
-          //       color: Colors.black.withValues(alpha: 0.4), // 40% dark overlay
-          //     ),
-          //   ),
 
           // 3. Touch Listener Layer on Top
           Positioned.fill(

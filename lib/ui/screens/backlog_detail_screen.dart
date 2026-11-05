@@ -1,6 +1,7 @@
 import 'package:backloggr/core/constants.dart';
 import 'package:backloggr/data/models/backlog_item.dart';
 import 'package:backloggr/data/services/supabase_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_flutter/dropdown_flutter.dart';
 import 'package:exui/exui.dart';
@@ -109,10 +110,10 @@ class _BacklogDetailScreenState extends State<BacklogDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       spacing: 16,
                       children: [
-                        Image.network(
-                          item.capsuleUrl!,
+                        CachedNetworkImage(
+                          imageUrl: item.capsuleUrl!,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
+                          errorWidget: (context, error, stackTrace) {
                             return Container(
                               color: Colors.grey[800],
                               child: Column(

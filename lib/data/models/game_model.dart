@@ -90,7 +90,7 @@ class GameModel {
         steamAppID!.trim().isNotEmpty &&
         steamAppID != '0' &&
         steamAppID != 'null') {
-      return 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/$steamAppID/library_600x900_2x.jpg';
+      return 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/$steamAppID/library_600x900.jpg';
     }
 
     // Fallback ke gambar HD horizontal jika bukan game Steam

@@ -4,6 +4,7 @@ import 'package:backloggr/data/services/supabase_service.dart';
 import 'package:backloggr/ui/widgets/game_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class BacklogScreen extends StatefulWidget {
   const BacklogScreen({super.key});
@@ -91,7 +92,8 @@ class _BacklogScreenState extends State<BacklogScreen> {
 
                       return LayoutBuilder(
                         builder: (context, constraints) {
-                          final crossAxisCount = 3;
+                          final crossAxisCount =
+                              context.isAtLeast(Breakpoint.md) ? 5 : 3;
                           return GridView.builder(
                             padding: EdgeInsets.symmetric(horizontal: 8),
                             gridDelegate:

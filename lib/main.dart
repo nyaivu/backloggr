@@ -3,9 +3,11 @@ import 'package:backloggr/ui/screens/backlog_screen.dart';
 import 'package:backloggr/ui/screens/backlog_detail_screen.dart';
 import 'package:backloggr/ui/screens/home_screen.dart';
 import 'package:backloggr/ui/screens/login_screen.dart';
+import 'package:backloggr/ui/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:backloggr/core/theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 
@@ -39,10 +41,6 @@ class AdaptiveNavigationShell extends StatelessWidget {
                     selectedIndex: navigationShell.currentIndex,
                     onDestinationSelected: _onDestinationSelected,
                     labelType: NavigationRailLabelType.all,
-                    leading: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Icon(Icons.school, size: 32),
-                    ),
                     destinations: const [
                       NavigationRailDestination(
                         icon: Icon(Icons.home_outlined),
@@ -50,13 +48,13 @@ class AdaptiveNavigationShell extends StatelessWidget {
                         label: Text('Home'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.class_outlined),
-                        selectedIcon: Icon(Icons.class_),
+                        icon: Icon(Icons.gamepad_outlined),
+                        selectedIcon: Icon(Icons.gamepad_sharp),
                         label: Text('Courses'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.person_outline),
-                        selectedIcon: Icon(Icons.person),
+                        icon: Icon(Icons.person_4_outlined),
+                        selectedIcon: Icon(Icons.person_4_sharp),
                         label: Text('Profile'),
                       ),
                     ],
@@ -85,7 +83,12 @@ class AdaptiveNavigationShell extends StatelessWidget {
               ),
               NavigationDestination(
                 icon: Icon(Icons.gamepad_outlined, color: AppColors.steamBlue),
-                selectedIcon: Icon(Icons.gamepad_rounded),
+                selectedIcon: Icon(Icons.gamepad_sharp),
+                label: '',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.person_4_outlined, color: AppColors.steamBlue),
+                selectedIcon: Icon(Icons.person_4_sharp),
                 label: '',
               ),
             ],
@@ -156,6 +159,14 @@ final GoRouter _router = GoRouter(
             ),
           ],
         ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const ProfileScreen(),
+            ),
+          ],
+        ),
       ],
     ),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
@@ -175,11 +186,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'Backloggr',
-      theme: AppTheme.darkTheme,
-      routerConfig: _router,
+    return ScreenUtilPlusInit(
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: 'Backloggr',
+        theme: AppTheme.darkTheme,
+        routerConfig: _router,
+      ),
     );
   }
 }
