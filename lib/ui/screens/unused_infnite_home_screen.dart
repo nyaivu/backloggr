@@ -112,21 +112,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "CATALOG",
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w700,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "CATALOG",
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w700,
           ),
-          centerTitle: true,
-          backgroundColor: AppColors.scaffoldBackground,
-          scrolledUnderElevation: 0.0,
         ),
-        body: Padding(
+        centerTitle: true,
+        backgroundColor: AppColors.scaffoldBackground,
+        scrolledUnderElevation: 0.0,
+      ),
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [

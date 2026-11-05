@@ -1,4 +1,5 @@
 import 'package:backloggr/core/constants.dart';
+import 'package:backloggr/data/providers/backlog_notifier.dart';
 import 'package:backloggr/ui/screens/backlog_screen.dart';
 import 'package:backloggr/ui/screens/backlog_detail_screen.dart';
 import 'package:backloggr/ui/screens/home_screen.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:backloggr/core/theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 
@@ -112,7 +114,14 @@ Future<void> main() async {
     publishableKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BacklogProvider()..loadBacklog()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 // 4. Configure GoRouter
