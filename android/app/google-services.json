@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1023607582121",
+    "project_id": "backloggr-notif",
+    "storage_bucket": "backloggr-notif.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023607582121:android:9a9b618db227ae4a5968b8",
+        "android_client_info": {
+          "package_name": "com.example.backloggr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvlTlynxQSMlnI4XzoNPAsWliQfjJvmpE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
